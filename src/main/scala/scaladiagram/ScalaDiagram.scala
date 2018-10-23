@@ -1,0 +1,5 @@
+package scaladiagram
+
+class ScalaDiagram {
+
+}
