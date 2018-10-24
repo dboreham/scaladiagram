@@ -1,5 +1,0 @@
-package scaladiagram
-
-class ScalaDiagram {
-
-}
