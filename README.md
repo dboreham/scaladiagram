@@ -11,5 +11,8 @@ Its delevopment processes as the following :
    Some kinds of types like **case class** /**object** /**class** /**trait** **function** etc being parsed for the following draw graph.
   
 2. **Doing** construct basic template for descibing UML  
+
+3. **Doing** free software Graphviz being chosen to draw UML graph. That means Graphviz being installed while using the prpejct.
+ 
    
 
