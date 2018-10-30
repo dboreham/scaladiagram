@@ -10,9 +10,10 @@ Its delevopment processes as the following :
 1. **Done** Parsing source code:  Based on [scalariform](http://scala-ide.github.com/scalariform/) jar for sketching the original file.
    Some kinds of types like **case class** /**object** /**class** /**trait** **function** etc being parsed for the following draw graph.
   
-2. **Doing** construct basic template for descibing UML  
+2. **Done** construct basic template for descibing UML.  
 
-3. **Doing** free software Graphviz being chosen to draw UML graph. That means Graphviz being installed while using the prpejct.
- 
+3. **Done** free software Graphviz being chosen to draw UML graph. APIs **Graphviz** developed for that.
+
+4. **Doing** combination developed code to graph. 
    
 
