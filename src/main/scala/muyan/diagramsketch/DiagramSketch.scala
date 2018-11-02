@@ -7,7 +7,8 @@ import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 //base code, can't get para if return type not explicit define
-private [diagramsketch] class DiagramSketch {
+//todo path as constructor para
+class DiagramSketch {
 
   val tempNode = new ListBuffer[SketchNode]()
 //todo read file with code
@@ -26,6 +27,7 @@ private [diagramsketch] class DiagramSketch {
 
   var clzDeepLength = 0
   val lite = new ListBuffer[DiagramLite] //final result
+
   def extractToken(in: Option[AstNode]): Unit = {
     val stat = if(in) in.get else None
 
@@ -122,6 +124,13 @@ private [diagramsketch] class DiagramSketch {
     findRangeByDeepLength(nextDeep, in).foreach{
       nex => sketchClazz(nextDeep, nex)
     }
+  }
+
+  def catalystSketch(path: String) = {
+   val in = sourceParser(readFile(path))
+    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
+    sketchClazz(1, tempNode)
+    lite
   }
 }
 

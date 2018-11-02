@@ -25,7 +25,7 @@ class Graphviz {
   * @param fileName specified the file name
   * */
   def writeDotToFile(src: String, fileName: String) = {
-    val file = new File(s"$tmpDir/$fileName.txt")
+    val file = new File(s"$tmpDir/$fileName.dot.tmp")
     val fop = new FileOutputStream(file)
     try{
       if (!file.exists) {
@@ -35,7 +35,7 @@ class Graphviz {
       fop.write(src.getBytes)
       fop.flush
     } catch {
-      case   ex : Exception => println(s"write file failure ${ex.printStackTrace()}")
+      case  ex : Exception => println(s"write file failure ${ex.printStackTrace()}")
     }finally {
       if(fop != null) fop.close()
     }
