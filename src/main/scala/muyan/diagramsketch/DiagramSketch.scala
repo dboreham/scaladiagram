@@ -129,7 +129,8 @@ class DiagramSketch {
   def catalystSketch(path: String) = {
    val in = sourceParser(readFile(path))
     in.topStats.otherStats.map(_._2).foreach(extractToken(_))
-    sketchClazz(1, tempNode)
+    //todo refactor findRangeByDeepLength function for single function
+     findRangeByDeepLength(1, tempNode).foreach(t => sketchClazz(2, t))
     lite
   }
 }
