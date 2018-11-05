@@ -10,6 +10,7 @@ import scala.io.Source
 //todo path as constructor para
 class DiagramSketch {
 
+  //temp node info in a file or package
   val tempNode = new ListBuffer[SketchNode]()
 //todo read file with code
   def readFile(path: String): String = {
@@ -25,7 +26,7 @@ class DiagramSketch {
 //   implicit def toOption[A <: SketchNode](in: A) : Option[A] = Some(in)
 //   implicit def isOption[A <: SketchNode](in: Option[A]) : Boolean = in.isDefined
 
-  var clzDeepLength = 0
+ private var clzDeepLength = 0
   val lite = new ListBuffer[DiagramLite] //final result
 
   def extractToken(in: Option[AstNode]): Unit = {
@@ -73,7 +74,13 @@ class DiagramSketch {
     sn
   }
 
-  def findRangeByDeepLength(deep: Int, range: ListBuffer[SketchNode]) = {
+  /**
+    *Given a deep length, split @range the same node as deep
+    * example: deep =1 means finding parent class text range
+    *@param deep  deep length about buffer
+    *@param range giving list
+   */
+  def findSameClazzByDeepLength(deep: Int, range: ListBuffer[SketchNode]) = {
 
     var start = 0
     var target = 0
@@ -94,13 +101,19 @@ class DiagramSketch {
     }
   }
 
-  def sketchClazz(deep: Int, in: ListBuffer[SketchNode]): Unit = {
+  /**
+    * @define sketch one class after class token being parsed
+    * @param root class deep length
+    * @param in nodes in a class including parent/children class, innerclass
+    *           and function etc.
+    * */
+  def sketchClazz(root: Int, in: ListBuffer[SketchNode]): Unit = {
 
     if(!in.head.isInstanceOf[ClazzSketch]) return
-    val root =  in.head.asInstanceOf[ClazzSketch]
-    val elem = DiagramLite(root)
-    val currentDeep = deep
-    val nextDeep = deep + 1
+    val head =  in.head.asInstanceOf[ClazzSketch]
+    val elem = DiagramLite(head)
+    val currentDeep = root
+    val nextDeep: Int = root + 1
 
    //sketch body
     for( el <- in) {
@@ -121,7 +134,7 @@ class DiagramSketch {
     //save lite to class val
     lite.append(elem)
 
-    findRangeByDeepLength(nextDeep, in).foreach{
+    findSameClazzByDeepLength(nextDeep, in).foreach{
       nex => sketchClazz(nextDeep, nex)
     }
   }
@@ -129,8 +142,8 @@ class DiagramSketch {
   def catalystSketch(path: String) = {
    val in = sourceParser(readFile(path))
     in.topStats.otherStats.map(_._2).foreach(extractToken(_))
-    //todo refactor findRangeByDeepLength function for single function
-     findRangeByDeepLength(1, tempNode).foreach(t => sketchClazz(2, t))
+    //todo refactor findSameClazzByDeepLength function for single function
+     findSameClazzByDeepLength(1, tempNode).foreach(t => sketchClazz(2, t))
     lite
   }
 }
