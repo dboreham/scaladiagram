@@ -14,6 +14,9 @@ Its delevopment processes as the following :
 
 3. **Done** free software Graphviz being chosen to draw UML graph. APIs **Graphviz** developed for that.
 
-4. **Doing** combination developed code to graph. 
+4. **Done** combination developed code to graph.
+
+5. **Doing** debug 
+
    
 
