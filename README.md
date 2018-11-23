@@ -16,7 +16,9 @@ Its delevopment processes as the following :
 
 4. **Done** combination developed code to graph.
 
-5. **Doing** debug 
+5. **Done** debug finished. uml graph being draw, when specified the path of scala file.
+
+6. **_Doing_** optimize code arch for being easily used, and understood. next, provied API and support cli prompt
 
    
 
