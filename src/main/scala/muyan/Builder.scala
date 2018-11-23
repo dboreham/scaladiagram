@@ -5,26 +5,48 @@ import muyan.graphviz.Graphviz
 import muyan.template.DigraphBase
 import muyan.template.EdgeGraph._
 
-class Builder(path: String) {
-  self: DiagramSketch with Graphviz with DigraphBase =>
+import scala.collection.mutable.ListBuffer
+
+
+class Builder(path: String) extends Graphviz with DiagramSketch {
   //todo check path is valid or not
   def isValid : Boolean = {
     //dir file
     true
   }
 
-  val sketch =  catalystSketch(path)
+  implicit def toSting(t: List[String]) :String = t.mkString("\n")
+
+  def fileSketch = catalystSketch(path)
 
   //todo parse function innerclass inherit class etc.
   //todo SketchNode add parsing function, every class override it.
-  val dotBuilder =  sketch.foreach{ case DiagramLite(clz, ext, inner, method) =>
-    addItem(clz.descSketch, method.map( e => s"${e.descSketch}").mkString("\n"),"")
-    if(ext.isDefined) addRelation(clz.descSketch, ext.get.descSketch, inherit)
-    inner.foreach {el =>
-     addRelation(clz.descSketch, el.descSketch, composition)}
+  def dotBuilder(buff: ListBuffer[DiagramLite]) =  {
+    buff.foreach{
+      case DiagramLite(clz, ext, inner, method) =>
+         val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
+
+        addItem(clz.descSketch, method.map( e => s"${e.descSketch.mkString("")}"),"")
+        (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
+          name => addItem(name, Nil,"")
+        }
+
+        extCtx.foreach {
+            o => addRelation(clz.descSketch, o, inherit)
+          }
+
+        inner.foreach {el =>
+          addRelation(clz.descSketch, el.descSketch, composition)}
+    }
   }
 
+  def build: Unit = {
+   val sketch = catalystSketch(path)
 
+    dotBuilder(sketch)
+    println(graphContent)
+    draw("wayne")
+  }
 
 
 }
