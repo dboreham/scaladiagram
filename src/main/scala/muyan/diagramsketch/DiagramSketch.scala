@@ -8,7 +8,7 @@ import scala.io.Source
 
 //base code, can't get para if return type not explicit define
 //todo path as constructor para
-class DiagramSketch {
+trait DiagramSketch {
 
   //temp node info in a file or package
   val tempNode = new ListBuffer[SketchNode]()
@@ -26,7 +26,7 @@ class DiagramSketch {
 //   implicit def toOption[A <: SketchNode](in: A) : Option[A] = Some(in)
 //   implicit def isOption[A <: SketchNode](in: Option[A]) : Boolean = in.isDefined
 
- private var clzDeepLength = 0
+  private var clzDeepLength = 0
   val lite = new ListBuffer[DiagramLite] //final result
 
   def extractToken(in: Option[AstNode]): Unit = {
@@ -47,7 +47,7 @@ class DiagramSketch {
       case  TemplateInheritanceSection(extend,_,parent) => {
 
         clzDeepLength += 1
-        val inherit = if(parent) Some(parent.get.tokens) else None
+        val inherit = if(parent) parent.get.tokens else Nil
         tempNode.append(updateTreeLength(InheritSketch(inherit), clzDeepLength))
         clzDeepLength -= 1
       }
@@ -140,8 +140,10 @@ class DiagramSketch {
   }
 
   def catalystSketch(path: String) = {
+    println("path: " + path)
    val in = sourceParser(readFile(path))
-    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
+//    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
+    in.topStats.otherStats.foreach(x => extractToken(x._2))
     //todo refactor findSameClazzByDeepLength function for single function
      findSameClazzByDeepLength(1, tempNode).foreach(t => sketchClazz(2, t))
     lite
