@@ -13,7 +13,7 @@ import scala.util.{Failure, Try}
   * @see http://www.graphviz.org
   * anyone can distribute and copy it.
   * */
-class Graphviz {
+class Graphviz extends DigraphBase {
 //get config dir from file
  private lazy val conf = ResourceBundle.getBundle("config")
   val tmpDir  = Try{conf.getString("tmpDir")}.getOrElse("/") //set default path /
@@ -60,5 +60,12 @@ class Graphviz {
       case _ =>
     })
   }
+ 
+   def draw(fileName: String, dest: String = tmpDir) = {
+    val ctx = graphContent
+    writeDotToFile(ctx ,fileName)
+    buildGraph(s"$tmpDir/$fileName.dot.tmp",tmpDir)
+  }
+
 
 } 
