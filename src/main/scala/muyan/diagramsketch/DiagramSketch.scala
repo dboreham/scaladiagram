@@ -97,7 +97,7 @@ trait DiagramSketch {
    res.append(range.size - 1)
    res.zip(res.tail).map {
      case (a,b) if(b - a == 1) => range.take(b).drop(a) //only has one element
-     case (x,y) => range.splitAt(x)._2.splitAt(y-1)._1 //split a range list buffer
+     case (x,y) => range.splitAt(x)._2.splitAt(y)._1 //split a range list buffer
     }
   }
 
