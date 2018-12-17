@@ -20,5 +20,7 @@ Its delevopment processes as the following :
 
 6. **_Doing_** optimize code arch for being easily used, and understood. next, provied API and support cli prompt
 
+7. **Done**  support multi file builde graph, and generate specified file name, same as scala file name 
+
    
 
