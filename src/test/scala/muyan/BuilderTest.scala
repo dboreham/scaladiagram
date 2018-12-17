@@ -15,7 +15,7 @@ class BuilderTest extends FlatSpec with ShouldMatchers  {
 
   "muyan" should "test Builder function about dot string and sketch result" in {
 
-//    val path = "M:\\BIGDATA\\SourceCode\\scaladiagram\\src\\main\\scala\\muyan\\Builder.scala"
+//    val path = "d:\"
     val builder = new Builder(path)
 
     builder.build
