@@ -9,11 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 
 class Builder(path: String) extends Graphviz with DiagramSketch {
-  //todo check path is valid or not
-  def isValid : Boolean = {
-    //dir file
-    true
-  }
+   require(new File(path).isFile)
 
   implicit def toSting(t: List[String]) :String = t.mkString("\n")
 
@@ -42,10 +38,10 @@ class Builder(path: String) extends Graphviz with DiagramSketch {
 
   def build: Unit = {
    val sketch = catalystSketch(path)
-
+    val file = new File(path).getName
     dotBuilder(sketch)
     println(graphContent)
-    draw("wayne")
+    draw(file)
   }
 
 
