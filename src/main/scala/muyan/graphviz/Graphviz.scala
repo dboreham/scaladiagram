@@ -64,7 +64,7 @@ class Graphviz extends DigraphBase {
    def draw(fileName: String, dest: String = tmpDir) = {
     val ctx = graphContent
     writeDotToFile(ctx ,fileName)
-    buildGraph(s"$tmpDir/$fileName.dot.tmp",tmpDir)
+    buildGraph(s"$tmpDir/$fileName.dot.tmp",s"$dest/$fileName")
   }
 
 
