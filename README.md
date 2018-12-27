@@ -22,5 +22,9 @@ Its delevopment processes as the following :
 
 7. **Done**  support multi file builde graph, and generate specified file name, same as scala file name 
 
+8. **Done** add feature: using command line to generate uml graph by specified directory.
+
+9. **Done** support  saving uml graph to pdg png jpg formatted file. 
+
    
 
