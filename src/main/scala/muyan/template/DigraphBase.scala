@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
  trait DigraphBase {
   val prefix = "digraph clz {"
   val postfix = "}"
-  val node = s"""node [ fontname = "Courier New", fontsize = 13, shape = "record" ];"""
+  val node = s"""node [ fontname = "Courier New", fontsize = 13, shape = "record", color="brown1"  ];"""
    val portName ="head"
    val methodName ="fun"
    val rankDir = "rankdir = BT"
