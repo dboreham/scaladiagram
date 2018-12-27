@@ -1,10 +1,11 @@
 package muyan.graphviz
 
-import java.io.{BufferedWriter, File, FileOutputStream, FileWriter}
+import java.io.{File, FileOutputStream}
 import java.util.ResourceBundle
 
-import scala.concurrent.Future
-import scala.util.{Failure, Try}
+import muyan.template.DigraphBase
+
+import scala.util.Try
 
 /**
   * An APIs for creating DOT file and saving formatted file such as jpg pdf.
@@ -13,10 +14,11 @@ import scala.util.{Failure, Try}
   * @see http://www.graphviz.org
   * anyone can distribute and copy it.
   * */
-class Graphviz extends DigraphBase {
+class Graphviz(dst: Option[String], format: String) extends DigraphBase{
 //get config dir from file
- private lazy val conf = ResourceBundle.getBundle("config")
+  private val conf = ResourceBundle.getBundle("config")
   val tmpDir  = Try{conf.getString("tmpDir")}.getOrElse("/") //set default path /
+  val dstPath = dst.getOrElse(tmpDir)
   val graphExecutable  =  Try{conf.getString("graphDir")}.getOrElse("/")
 
   /**
@@ -40,32 +42,45 @@ class Graphviz extends DigraphBase {
       if(fop != null) fop.close()
     }
   }
+
   /**
     * call graphviz command line to build graph file, and save in specified directory
     * @param path file absolute path
-    * @param dest destination path
+    * @param dest destination path with file name
     * */
   def buildGraph(path: String, dest: String) ={
-    import scala.concurrent.ExecutionContext.Implicits.global
-    import scala.concurrent.Future
-    val outputFormat ="pdf"
-    val args = s"$graphExecutable -T $outputFormat $path -o $dest/${System.currentTimeMillis()}.$outputFormat"
+
+    val args = s"$graphExecutable -T $format:cairo:gd $path -o $dest.$format"
     val runTime = Runtime.getRuntime
-    val f = Future {
+
+    try {
       runTime.exec(args)
     }
+    catch {
+      case e: Exception => e.printStackTrace()
+    }
 
+/*    val f = Future {
+      runTime.exec(args)
+    }
+    Await.result(f, 3 seconds )
     f.onComplete({
       case Failure(e)=> e.printStackTrace()
       case _ =>
-    })
-  }
- 
-   def draw(fileName: String, dest: String = tmpDir) = {
-    val ctx = graphContent
-    writeDotToFile(ctx ,fileName)
-    buildGraph(s"$tmpDir/$fileName.dot.tmp",s"$dest/$fileName")
+    })*/
+
   }
 
+  def draw(fileName: String, dest: String = tmpDir) = {
+    val ctx = graphContent
+    writeDotToFile(ctx ,fileName)
+    val src = s"$tmpDir/$fileName.dot.tmp"
+    buildGraph(src ,s"$dstPath/$fileName")
+
+  }
+
+  def deleteTmpFile(file: File): Unit = {
+    if(file.isFile) file.delete()
+  }
 
 } 
