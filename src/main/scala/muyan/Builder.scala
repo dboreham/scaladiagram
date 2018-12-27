@@ -1,15 +1,16 @@
 package muyan
 
+import java.io.File
+
 import muyan.diagramsketch.{DiagramLite, DiagramSketch}
 import muyan.graphviz.Graphviz
-import muyan.template.DigraphBase
 import muyan.template.EdgeGraph._
 
 import scala.collection.mutable.ListBuffer
 
 
-class Builder(path: String) extends Graphviz with DiagramSketch {
-   require(new File(path).isFile)
+class Builder(path: String, dst: Option[String], format: String) extends Graphviz(dst, format) with DiagramSketch {
+  require(new File(path).isFile)
 
   implicit def toSting(t: List[String]) :String = t.mkString("\n")
 
@@ -17,7 +18,7 @@ class Builder(path: String) extends Graphviz with DiagramSketch {
 
   //todo parse function innerclass inherit class etc.
   //todo SketchNode add parsing function, every class override it.
-  def dotBuilder(buff: ListBuffer[DiagramLite]) =  {
+ private [this]def dotBuilder(buff: ListBuffer[DiagramLite]) =  {
     buff.foreach{
       case DiagramLite(clz, ext, inner, method) =>
          val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
@@ -38,11 +39,11 @@ class Builder(path: String) extends Graphviz with DiagramSketch {
 
   def build: Unit = {
    val sketch = catalystSketch(path)
-    val file = new File(path).getName
+   val name = new File(path).getName
     dotBuilder(sketch)
     println(graphContent)
-    draw(file)
+    draw(name)
   }
 
-
 }
+
