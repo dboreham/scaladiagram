@@ -71,7 +71,7 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
 
   }
 
-  def draw(fileName: String, dest: String = tmpDir) = {
+  def draw(fileName: String) = {
     val ctx = graphContent
     writeDotToFile(ctx ,fileName)
     val src = s"$tmpDir/$fileName.dot.tmp"
