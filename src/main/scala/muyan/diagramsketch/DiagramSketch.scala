@@ -13,9 +13,36 @@ trait DiagramSketch {
   //temp node info in a file or package
   val tempNode = new ListBuffer[SketchNode]()
 //todo read file with code
-  def readFile(path: String): String = {
-    Source.fromFile(path).mkString
+def readFile(file: String, encoding: Option[String])(implicit codec: Codec): String = {
+  @tailrec //tailrec for reading encoding
+  def readFileWithEncoding(file: String, encodings: List[String]): Option[String] = {
+    if (encodings.isEmpty) {
+      None
+    } else {
+      val encoding = encodings.head
+      try {
+        Some(Source.fromFile(file)(encoding).mkString)
+      } catch {
+        case _: MalformedInputException =>
+          readFileWithEncoding(file, encodings.tail)
+      }
+    }
   }
+
+  val encodings = encoding match {
+    case Some(x) => List(x)
+    case None => List(codec.charSet.toString, "UTF-8", "UTF-16", "ISO-8859-1")
+  }
+
+  // as far as I can tell, most files should be readable with ISO-8859-1 (though obviously it won't
+  // return the correct characters), so I don't know under what circumstances we can get
+  // the MalformedInputException (and therefore) RuntimeException here.
+  readFileWithEncoding(file, encodings) match {
+    case None => throw new RuntimeException("Could not read file, caught MalformedInputException")
+    case Some(source) => source
+  }
+}
+
 
   def sourceParser(source: String): CompilationUnit = {
     val tokens = ScalaLexer.tokenise(source, forgiveErrors = true, "2.11.0")
@@ -96,8 +123,17 @@ trait DiagramSketch {
 
    res.append(range.size - 1)
    res.zip(res.tail).map {
-     case (a,b) if(b - a == 1) => range.take(b).drop(a) //only has one element
-     case (x,y) => range.splitAt(x)._2.splitAt(y)._1 //split a range list buffer
+     //only has one element
+     case (a,b) if(b == a ) => {
+    val t = if(b == 0) range.take(1) else range.take(b).drop(b - 1)
+//       println(s"b:$b-a:$a:" + t)
+       t
+     }
+     case (x,y) => {
+         val start = range.take(x)
+         val end = range.take(y)
+         end.diff(start)
+     }
     }
   }
 
