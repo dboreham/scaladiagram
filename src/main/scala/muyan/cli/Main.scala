@@ -7,7 +7,7 @@ import muyan.Builder
 case class CliConfig(
                     src: String,
                     dst: Option[String] = None,
-                    format: String = "PDF"
+                    format: String = "pdf"
                     )
 
 object Main {
