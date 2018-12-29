@@ -15,7 +15,10 @@ import scala.collection.mutable.ListBuffer
 //  val edge: String //mixed in digraph base
 
   def addItem(name: String, fun: List[String], varList: String) = {
-    val ret =  s"""$name [label = "{ <$portName> $name | <var> ${varList.toString()} | <fun> ${fun.mkString("\\l")} }"];"""
+    
+   def toStringWithEscape(t: List[String]): String = t.map(x => x + "\\l").mkString
+    
+    val ret =  s"""$name [label = "{ <$portName> $name | <var> ${toStringWithEscape(varList)} | <fun> ${toStringWithEscape(fun)} }"];"""
     itemBuff.prepend(ret.replace("=>", "=\\>"))
   }
 
@@ -33,8 +36,8 @@ import scala.collection.mutable.ListBuffer
     s"""$prefix
        $rankDir
        |$node
-       |${itemBuff.mkString("\n")}
-       |${relationBuff.mkString("\n")}
+       |${itemBuf}
+       |${relationBuff}
        |$postfix """ .stripMargin
   }
 
