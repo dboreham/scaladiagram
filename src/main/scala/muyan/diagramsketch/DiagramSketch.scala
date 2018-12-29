@@ -92,6 +92,13 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
         tempNode.append(updateTreeLength(FunctionSketch(List(defToken, nameToken), paramClauses, returnTypeOpt), clzDeepLength))
         clzDeepLength -= 1
       }
+      case PatDefOrDcl(_, expr, otherPatterns, typedOpt, _) => {
+        clzDeepLength += 1
+        val attr = expr.tokens ::: otherPatterns.flatMap(_._2.tokens)
+        val t =  if(typedOpt.isDefined) Some(typedOpt.get._2.tokens) else  None
+        tempNode.append(updateTreeLength(AttributeSketch(attr, t), clzDeepLength))
+        clzDeepLength -= 1
+      }
       case _ => //println("### Not MATCH TYPE")
     }
   }
