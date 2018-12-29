@@ -14,10 +14,9 @@ import scala.collection.mutable.ListBuffer
   // Composition, Dependency ...
 //  val edge: String //mixed in digraph base
 
-   //add an object to graph
   def addItem(name: String, fun: List[String], varList: String) = {
     val ret =  s"""$name [label = "{ <$portName> $name | <var> ${varList.toString()} | <fun> ${fun.mkString("\\l")} }"];"""
-    itemBuff.prepend(ret)
+    itemBuff.prepend(ret.replace("=>", "=\\>"))
   }
 
   def addRelation(parent: String, child: String, relation: String) ={
