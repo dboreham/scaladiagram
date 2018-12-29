@@ -46,6 +46,14 @@ case class FunctionSketch(fun: List[Token], param: ParamClauses ,returnType: Opt
 }
 
 
+case class AttributeSketch(name: List[Token], typeOpt: Option[List[Token]] = None) extends SketchNode {
+  override def descSketch: List[String] = {
+    val t = if(typeOpt.isDefined) ":" + typeOpt.get.map( _.text).mkString else ""
+    val res = name.map(_.text + t)
+   // println("AttributeSketch" + res)
+    res
+  }
+}
   case class DiagramLite(clz: ClazzSketch,
                        var ext: Option[InheritSketch] = None,
                        var inner: List[ClazzSketch] = Nil,
