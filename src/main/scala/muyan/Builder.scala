@@ -21,12 +21,12 @@ class Builder(path: String, dst: Option[String], format: String) extends Graphvi
  private [this]def dotBuilder(buff: ListBuffer[DiagramLite]) =  {
     buff.foreach{
       case DiagramLite(clz, ext, inner, method) =>
-         val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
-
         addItem(clz.descSketch, method.map( e => s"${e.descSketch.mkString("")}"),"")
-        (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
+       
+       val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
+       /* (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
           name => addItem(name, Nil,"")
-        }
+        } */
 
         extCtx.foreach {
             o => addRelation(clz.descSketch, o, inherit)
