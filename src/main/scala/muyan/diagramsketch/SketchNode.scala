@@ -57,6 +57,7 @@ case class AttributeSketch(name: List[Token], typeOpt: Option[List[Token]] = Non
   case class DiagramLite(clz: ClazzSketch,
                        var ext: Option[InheritSketch] = None,
                        var inner: List[ClazzSketch] = Nil,
-                       var fun: List[FunctionSketch] = Nil) //extends SketchNode
+                       var fun: List[FunctionSketch] = Nil,
+                       var attr: List[AttributeSketch] = Nil) //extends SketchNode
 
 

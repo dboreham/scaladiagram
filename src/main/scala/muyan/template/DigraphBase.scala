@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
   // Composition, Dependency ...
 //  val edge: String //mixed in digraph base
 
-  def addItem(name: String, fun: List[String], varList: String) = {
+  def addItem(name: String, fun: List[String], varList: List[String]) = {
     
    def toStringWithEscape(t: List[String]): String = t.map(x => x + "\\l").mkString
     
@@ -36,7 +36,7 @@ import scala.collection.mutable.ListBuffer
     s"""$prefix
        $rankDir
        |$node
-       |${itemBuf}
+       |${itemBuff}
        |${relationBuff}
        |$postfix """ .stripMargin
   }

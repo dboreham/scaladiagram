@@ -1,10 +1,13 @@
 package muyan.diagramsketch
 
+import java.nio.charset.MalformedInputException
+
 import scalariform.lexer.{ScalaLexer, Token}
 import scalariform.parser._
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
-import scala.io.Source
+import scala.io.{Codec, Source}
 
 //base code, can't get para if return type not explicit define
 //todo path as constructor para
@@ -184,7 +187,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
 
   def catalystSketch(path: String) = {
     println("path: " + path)
-   val in = sourceParser(readFile(path))
+   val in = sourceParser(readFile(path, None))
 //    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
     in.topStats.otherStats.foreach(x => extractToken(x._2))
     //todo refactor findSameClazzByDeepLength function for single function
