@@ -21,7 +21,7 @@ class Builder(path: String, dst: Option[String], format: String) extends Graphvi
  private [this]def dotBuilder(buff: ListBuffer[DiagramLite]) =  {
     buff.foreach{
       case DiagramLite(clz, ext, inner, method, attr) =>
-        addItem(clz.descSketch, method.map( e => s"${e.descSketch.mkString("")}"), attr.flatMap( e => e.descSketch))
+        addItem(clz.descSketch, method.flatMap( e => e.descSketch), attr.flatMap( e => e.descSketch))
        
        val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
        /* (extCtx.filterNot(clz.descSketch.contains(_))).foreach {

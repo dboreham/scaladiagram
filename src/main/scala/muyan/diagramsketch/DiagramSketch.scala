@@ -173,6 +173,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
         el match {
           case clz @ ClazzSketch(_, _) => elem.inner = clz :: elem.inner //inner class
           case fun @ FunctionSketch(_, _, _) => elem.fun = fun :: elem.fun //function get
+          case attr @ AttributeSketch(_, _ ) => elem.attr = attr :: elem.attr
           case _ =>
         }
       }

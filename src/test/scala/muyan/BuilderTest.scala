@@ -14,9 +14,8 @@ import scala.util.Try
 class BuilderTest extends FlatSpec with ShouldMatchers  {
 
   "muyan" should "test Builder function about dot string and sketch result" in {
-
-   val path = "d:\"
-    val builder = new Builder(path,None, "pdf")
+    val path = "F:\\sourcecode\\spline\\"
+    val builder = new Builder(path,None, "png")
 
     builder.build
 

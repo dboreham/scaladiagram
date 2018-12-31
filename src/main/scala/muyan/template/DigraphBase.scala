@@ -36,8 +36,8 @@ import scala.collection.mutable.ListBuffer
     s"""$prefix
        $rankDir
        |$node
-       |${itemBuff}
-       |${relationBuff}
+       |${itemBuff.mkString}
+       |${relationBuff.mkString}
        |$postfix """ .stripMargin
   }
 

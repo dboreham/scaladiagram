@@ -16,7 +16,7 @@ import scala.util.Try
   * */
 class Graphviz(dst: Option[String], format: String) extends DigraphBase{
 //get config dir from file
-  private val conf = ResourceBundle.getBundle("config")
+  private  lazy  val conf = ResourceBundle.getBundle("config")
   val tmpDir  = Try{conf.getString("tmpDir")}.getOrElse("/") //set default path /
   val dstPath = dst.getOrElse(tmpDir)
   val graphExecutable  =  Try{conf.getString("graphDir")}.getOrElse("/")
@@ -50,9 +50,9 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
     * */
   def buildGraph(path: String, dest: String) ={
 
-    val args = s"$graphExecutable -T $format:cairo:gd $path -o $dest.$format"
+    val args = s"$graphExecutable -T $format $path -o $dest.$format"
     val runTime = Runtime.getRuntime
-
+    println(args)
     try {
       runTime.exec(args)
     }
