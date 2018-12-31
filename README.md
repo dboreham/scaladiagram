@@ -16,7 +16,7 @@ Its delevopment processes as the following :
 
 4. **Done** combination developed code to graph.
 
-5. **Done** debug finished. uml graph being draw, when specified the path of scala file.
+5. **Done** debug finished. `uml graph being draw`, when specified the path of scala file.
 
 6. **_Doing_** optimize code arch for being easily used, and understood. next, provied API and support cli prompt
 
@@ -25,6 +25,10 @@ Its delevopment processes as the following :
 8. **Done** add feature: using command line to generate uml graph by specified directory.
 
 9. **Done** support  saving uml graph to pdg png jpg formatted file. 
+
+10. **Done** support scala class variable parsing.
+
+11. **Doing** debug test case.
 
    
 
