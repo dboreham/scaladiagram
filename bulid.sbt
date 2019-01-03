@@ -1,4 +1,4 @@
-import sbtassembly.Plugin.AssemblyKeys.{assemblyOption, jarName}
+import sbtassembly.Plugin.AssemblyKeys.{assemblyOption, jarName, assembly}
 import spray.revolver.RevolverPlugin.Revolver
 
 name := "scaladiagram"
