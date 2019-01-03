@@ -7,8 +7,8 @@ version := "0.1"
 
 //scalaVersion := "2.10.6"
 
-scalaVersion in ThisBuild := "2.10.6"
-
+scalaVersion in ThisBuild := "2.11.8"
+scalacOptions ++= Seq("-deprecation", "-feature")
 
 // https://mvnrepository.com/artifact/org.scalatest/scalatest
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % Test
@@ -21,3 +21,7 @@ Revolver.settings
 parallelExecution in Test := false
 
 assemblySettings
+
+jarName in assembly := s"scaladiagram-0.1.jar"
+
+test in assembly := {}
