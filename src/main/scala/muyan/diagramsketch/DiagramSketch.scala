@@ -1,7 +1,7 @@
 package muyan.diagramsketch
 
 import java.nio.charset.MalformedInputException
-
+import scala.language.implicitConversions
 import scalariform.lexer.{ScalaLexer, Token}
 import scalariform.parser._
 
@@ -9,13 +9,13 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.io.{Codec, Source}
 
-//base code, can't get para if return type not explicit define
+
 //todo path as constructor para
 trait DiagramSketch {
 
   //temp node info in a file or package
   val tempNode = new ListBuffer[SketchNode]()
-//todo read file with code
+
 def readFile(file: String, encoding: Option[String])(implicit codec: Codec): String = {
   @tailrec //tailrec for reading encoding
   def readFileWithEncoding(file: String, encodings: List[String]): Option[String] = {
@@ -53,9 +53,11 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
   }
 
    implicit def isExist[ T <: AstNode](para: Option[T]): Boolean = para.isDefined
-//   implicit def toOption[A <: SketchNode](in: A) : Option[A] = Some(in)
-//   implicit def isOption[A <: SketchNode](in: Option[A]) : Boolean = in.isDefined
 
+    /**
+    * For recursion sketching scala classes, results should be saved like binary tree.
+    * root is class ,leafs are extend class and method. @clzDeepLength describes the relation.
+    * */
   private var clzDeepLength = 0
   val lite = new ListBuffer[DiagramLite] //final result
 
@@ -75,37 +77,44 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
       }
         //todo inherit para resolver
       case  TemplateInheritanceSection(extend,_,parent) => {
-
-        clzDeepLength += 1
-        val inherit = if(parent) parent.get.tokens else Nil
-        tempNode.append(updateTreeLength(InheritSketch(inherit), clzDeepLength))
-        clzDeepLength -= 1
+        updateData{
+          val inherit = if(parent) parent.get.tokens else Nil
+          InheritSketch(inherit)
+        }
       }
       case TemplateBody(_, lb, statSeq, rb) => {
+        updateData{
+          tempNode.append(updateTreeLength(Slash(lb), clzDeepLength ))
+          statSeq.otherStats.foreach{el => extractToken(el._2)}
+          extractToken(statSeq.firstStatOpt)
+          Slash(rb)
+        }
 
-        clzDeepLength += 1
-        tempNode.append(updateTreeLength(Slash(lb), clzDeepLength ))
-        statSeq.otherStats.foreach{el => extractToken(el._2)}
-        extractToken(statSeq.firstStatOpt)
-        tempNode.append(updateTreeLength(Slash(rb),clzDeepLength))
-        clzDeepLength -= 1
       }
       case FunDefOrDcl(defToken, nameToken: Token, _, paramClauses, returnTypeOpt: Option[(Token, Type)], _, _) => {
-        clzDeepLength += 1
-        tempNode.append(updateTreeLength(FunctionSketch(List(defToken, nameToken), paramClauses, returnTypeOpt), clzDeepLength))
-        clzDeepLength -= 1
+        updateData{
+          FunctionSketch(List(defToken, nameToken), paramClauses, returnTypeOpt)
+        }
+
       }
-      case PatDefOrDcl(_, expr, otherPatterns, typedOpt, _) => {
-        clzDeepLength += 1
-        val attr = expr.tokens ::: otherPatterns.flatMap(_._2.tokens)
-        val t =  if(typedOpt.isDefined) Some(typedOpt.get._2.tokens) else  None
-        tempNode.append(updateTreeLength(AttributeSketch(attr, t), clzDeepLength))
-        clzDeepLength -= 1
+      case PatDefOrDcl(_, expr, otherPatterns, typedOpt, _) => { //sketch variable param
+        updateData{
+          val attr = expr.tokens ::: otherPatterns.flatMap(_._2.tokens)
+          val t =  if(typedOpt.isDefined) Some(typedOpt.get._2.tokens) else  None
+          AttributeSketch(attr, t)
+        }
       }
       case _ => //println("### Not MATCH TYPE")
     }
   }
 
+  
+  private def updateData(f:  => SketchNode) : Unit = {
+    clzDeepLength += 1
+    tempNode.append(updateTreeLength(f, clzDeepLength))
+    clzDeepLength -= 1
+  }
+  
   def updateTreeLength[B <: SketchNode](sn : B, len: Int): B = {
     sn.deepLength = len
     sn
