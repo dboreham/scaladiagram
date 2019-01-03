@@ -1,12 +1,9 @@
 package muyan.diagramsketch
 
-import scalariform.lexer.{Token, TokenType, Tokens}
-import scalariform.parser.{AstNode, ParamClauses, Type}
+import scalariform.lexer.{Token, Tokens}
+import scalariform.parser.{ParamClauses, Type}
 
 sealed trait SketchNode {
-  implicit def isExist[ T <: AstNode](para: Option[T]): Boolean = para.isDefined
-  implicit def toOption[A <: SketchNode](in: A) : Option[A] = Some(in)
-  implicit def isOption[A <: SketchNode](in: Option[A]) : Boolean = in.isDefined
   var deepLength = 0
   def descSketch: List[String]
 }
