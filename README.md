@@ -11,7 +11,7 @@ Program depends on [graphviz](https://graphviz.gitlab.io/). Before running the p
 
 
 
-# config 
+# configuration 
 
 see the detail resource file like the following:
 
