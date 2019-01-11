@@ -26,10 +26,10 @@ case class Slash(slh: Token) extends SketchNode {
   override def descSketch: List[String] = Nil
 }
 
-case class FunctionSketch(fun: List[Token], param: ParamClauses ,returnType: Option[(Token, Type)]) extends SketchNode {
+case class FunctionSketch(method: List[Token], param: ParamClauses, returnType: Option[(Token, Type)]) extends SketchNode {
   override def descSketch: List[String] = {
 
-    val name = fun.filter(_.tokenType.eq(Tokens.VARID)).map(_.text).mkString
+    val name = method.filter(_.tokenType.eq(Tokens.VARID)).map(_.text).mkString
    // println(name)
     val paraList = param.tokens.map(_.text).mkString
     val ret =  if (returnType.isDefined)  {
@@ -51,9 +51,9 @@ case class AttributeSketch(name: List[Token], typeOpt: Option[List[Token]] = Non
   }
 }
   case class DiagramLite(clz: ClazzSketch,
-                       var ext: Option[InheritSketch] = None,
-                       var inner: List[ClazzSketch] = Nil,
-                       var fun: List[FunctionSketch] = Nil,
-                       var attr: List[AttributeSketch] = Nil) //extends SketchNode
+                         var ext: Option[InheritSketch] = None,
+                         var inner: List[ClazzSketch] = Nil,
+                         var method: List[FunctionSketch] = Nil,
+                         var attr: List[AttributeSketch] = Nil) //extends SketchNode
 
 
