@@ -93,7 +93,17 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
       }
       case FunDefOrDcl(defToken, nameToken: Token, _, paramClauses, returnTypeOpt: Option[(Token, Type)], _, _) => {
         updateData{
-          FunctionSketch(List(defToken, nameToken), paramClauses, returnTypeOpt)
+         val filterVar: List[(ParamClause, Option[Token])] = paramClauses.paramClausesAndNewlines.map{
+                case (pc, opt) =>
+                  if(pc.firstParamOption.isDefined) {
+                    val p: Param = pc.firstParamOption.get
+                    val setVar =  p.copy(defaultValueOpt = None)
+                    (pc.copy(firstParamOption = Some(setVar)), opt)
+                  } else (pc, opt)
+              }
+          
+          val paraList = ParamClauses(paramClauses.newlineOpt, filterVar)
+          FunctionSketch(List(defToken, nameToken), paraList, returnTypeOpt)
         }
 
       }
