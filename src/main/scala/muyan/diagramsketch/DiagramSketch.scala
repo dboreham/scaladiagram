@@ -10,7 +10,6 @@ import scala.collection.mutable.ListBuffer
 import scala.io.{Codec, Source}
 
 
-//todo path as constructor para
 trait DiagramSketch {
 
   //temp node info in a file or package
@@ -75,7 +74,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
        extractToken(body)
         clzDeepLength -= 1
       }
-        //todo inherit para resolver
+
       case  TemplateInheritanceSection(extend,_,parent) => {
         updateData{
           val inherit = if(parent) parent.get.tokens else Nil
@@ -206,11 +205,11 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
   }
 
   def catalystSketch(path: String) = {
-    println("path: " + path)
+
    val in = sourceParser(readFile(path, None))
 //    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
     in.topStats.otherStats.foreach(x => extractToken(x._2))
-    //todo refactor findSameClazzByDeepLength function for single function
+
      findSameClazzByDeepLength(1, tempNode).foreach(t => sketchClazz(2, t))
     lite
   }

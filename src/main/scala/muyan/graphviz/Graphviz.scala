@@ -31,7 +31,7 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
     val fop = new FileOutputStream(file)
     try{
       if (!file.exists) {
-        println("file not exist")
+
         file.createNewFile
       }
       fop.write(src.getBytes)

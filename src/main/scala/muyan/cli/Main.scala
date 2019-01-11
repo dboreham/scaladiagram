@@ -12,7 +12,6 @@ case class CliConfig(
 
 object Main {
 
-  //todo multi thread create graph
   /**
     * @define scan dir according command line para
     * @param para  para parsed by command line
@@ -39,7 +38,7 @@ object Main {
   //entrance of cli command
   def main(args: Array[String]): Unit = {
     var conf = CliConfig("") //default src path is empty
-    println(args.toList.mkString(" "))
+
     if (args.isEmpty) help()
     else {
       val itor = args.toIterator

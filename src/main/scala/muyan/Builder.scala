@@ -16,17 +16,17 @@ class Builder(path: String, dst: Option[String], format: String) extends Graphvi
 
   def fileSketch = catalystSketch(path)
 
-  //todo parse function innerclass inherit class etc.
-  //todo SketchNode add parsing function, every class override it.
+
  private [this]def dotBuilder(buff: ListBuffer[DiagramLite]) =  {
     buff.foreach{
       case DiagramLite(clz, ext, inner, method, attr) =>
         addItem(clz.descSketch, method.flatMap( e => e.descSketch), attr.flatMap( e => e.descSketch))
        
        val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
-       /* (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
-          name => addItem(name, Nil,"")
-        } */
+        //todo fix class has same name
+        (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
+          name => addItem(name, Nil,Nil)
+        }
 
         extCtx.foreach {
             o => addRelation(clz.descSketch, o, inherit)
