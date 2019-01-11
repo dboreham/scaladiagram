@@ -24,8 +24,7 @@ object Main {
 
   //build all
   def buildFile(file: File, dst: Option[String], format: String): Unit = {
-    val fileList = file.listFiles()
-
+    val fileList: Array[File] = if(file.isFile) Array[File]{file} else file.listFiles()
     for (in <- fileList) {
       println(in.isFile + " -> " + in.getAbsolutePath)
       if(in.isFile ) {
