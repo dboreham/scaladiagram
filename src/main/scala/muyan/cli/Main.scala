@@ -61,7 +61,7 @@ object Main {
   //usage command
   def help(): Unit  ={
     println("scaladiagram help list:")
-    println("usage: java -jar jarName <source path> [dest path] [format]" )
+    println("usage: java -jar jarName -src <source path> [dest path] [format]" )
     println(s" -src           scala file path(required)")
     println(s" -dst           diagram file storage path")
     println(s" -f             diagram file storage format,")
