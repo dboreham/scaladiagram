@@ -1,8 +1,9 @@
 package muyan.diagramsketch
 
 import java.nio.charset.MalformedInputException
+
 import scala.language.implicitConversions
-import scalariform.lexer.{ScalaLexer, Token}
+import scalariform.lexer.{ScalaLexer, Token, Tokens}
 import scalariform.parser._
 
 import scala.annotation.tailrec
