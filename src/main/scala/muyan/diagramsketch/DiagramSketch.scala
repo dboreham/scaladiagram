@@ -96,8 +96,12 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
                 case (pc, opt) =>
                   if(pc.firstParamOption.isDefined) {
                     val p: Param = pc.firstParamOption.get
-                    val setVar =  p.copy(defaultValueOpt = None)
-                    (pc.copy(firstParamOption = Some(setVar)), opt)
+                    val firstVar =  p.copy(defaultValueOpt = None)
+                    val otherVar = pc.otherParams.map{
+                      case (token, param) =>
+                        (token,param.copy(defaultValueOpt = None))
+                    }
+                    (pc.copy(firstParamOption = Some(firstVar), otherParams = otherVar), opt)
                   } else (pc, opt)
               }
           
@@ -129,80 +133,6 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
     sn
   }
 
-  /**
-    *Given a deep length, split @range the same node as deep
-    * example: deep =1 means finding parent class text range
-    *@param deep  deep length about buffer
-    *@param range giving list
-   */
-  def findSameClazzByDeepLength(deep: Int, range: ListBuffer[SketchNode]) = {
-
-    var start = 0
-    var target = 0
-    val  res = new ListBuffer[Int]()
-    while (target != range.length && target != -1) {
-      target = range.indexWhere({
-        x => x.deepLength == deep
-      }, start)
-
-      if (target != -1)  res.append(target)
-      start = target + 1
-    }
-
-   res.append(range.size - 1)
-   res.zip(res.tail).map {
-     //only has one element
-     case (a,b) if(b == a ) => {
-    val t = if(b == 0) range.take(1) else range.take(b).drop(b - 1)
-//       println(s"b:$b-a:$a:" + t)
-       t
-     }
-     case (x,y) => {
-         val start = range.take(x)
-         val end = range.take(y)
-         end.diff(start)
-     }
-    }
-  }
-
-  /**
-    * @define sketch one class after class token being parsed
-    * @param root class deep length
-    * @param in nodes in a class including parent/children class, innerclass
-    *           and function etc.
-    * */
-  def sketchClazz(root: Int, in: ListBuffer[SketchNode]): Unit = {
-
-    if(!in.head.isInstanceOf[ClazzSketch]) return
-    val head =  in.head.asInstanceOf[ClazzSketch]
-    val elem = DiagramLite(head)
-    val currentDeep = root
-    val nextDeep: Int = root + 1
-
-   //sketch body
-    for( el <- in) {
-      if (el.deepLength == currentDeep) {
-       el  match {
-          case inhert @ InheritSketch(_) => elem.ext = Some(inhert)
-          case _ =>
-        }
-      }
-      if(el.deepLength == nextDeep) { //for class body sketch
-        el match {
-          case clz @ ClazzSketch(_, _) => elem.inner = clz :: elem.inner //inner class
-          case fun @ FunctionSketch(_, _, _) => elem.method = fun :: elem.method //function get
-          case attr @ AttributeSketch(_, _ ) => elem.attr = attr :: elem.attr
-          case _ =>
-        }
-      }
-    }
-    //save lite to class val
-    lite.append(elem)
-
-    findSameClazzByDeepLength(nextDeep, in).foreach{
-      nex => sketchClazz(nextDeep, nex)
-    }
-  }
 
   def catalystSketch(path: String) = {
 
@@ -210,9 +140,81 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
 //    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
     in.topStats.otherStats.foreach(x => extractToken(x._2))
 
-     findSameClazzByDeepLength(1, tempNode).foreach(t => sketchClazz(2, t))
-    lite
+     parseSketch(reconstructParseTree())
   }
+  
+ def reconstructParseTree() = {
+
+    val len = tempNode.length
+    val ret = new ListBuffer[ListBuffer[SketchNode]]()
+    for( index <- 0 until len) {
+      val elem = tempNode(index)
+
+      if (elem.isInstanceOf[ClazzSketch] ) {
+       val r = getSameDeepNode(index, elem.deepLength)
+        val p = getElement(r)
+        ret.append(p.+=:(elem.asInstanceOf[ClazzSketch]))
+      }
+
+    }
+    ret
+  }
+
+   //get element in temp node
+  def getElement(range: ListBuffer[(Int, Int)]) = {
+    range.map {
+      case (a,b) if(b == a ) => {
+        List(tempNode(a))
+      }
+      case (x,y) => {
+        val start = tempNode.take(x)
+        val end = tempNode.take(y)
+        end.diff(start).toList
+      }
+    }.flatten
+  }
+ 
+    /**
+    * when finding body and extend info, or getting class sketch, program must return result [range]
+    * get body and extends elements with the same deep length 
+    * */
+  def getSameDeepNode(index: Int, deep: Int): ListBuffer[(Int,Int)] = {
+    require((index >= 0 && index <= tempNode.length - 1), "index out of range in get same deeep node")
+    var isLeftBrace = false
+    var start = -1
+
+    val range = new ListBuffer[(Int,Int)]()
+    val scanStart = index + 1
+
+    for ( i <- scanStart until tempNode.length if(scanStart < tempNode.length)) {
+      val v = tempNode(i)
+
+      if(v.deepLength.equals(deep + 1) ) {
+        v match {
+          case InheritSketch(_) => range.append((i, i))
+          case Slash(lb) if( lb.tokenType.equals(Tokens.LBRACE)) => {
+            start = i
+            if (isLeftBrace) return range //repeat get the level lb
+            isLeftBrace = true
+          }
+          case Slash(rb) if(isLeftBrace && rb.tokenType.equals(Tokens.RBRACE)) => {
+            range.append((start, i))
+            return range
+          }
+          case out if(out.isInstanceOf[ClazzSketch]  ) => {
+            println("next level tree node, return")
+            return range
+          }
+        }
+      } else if (v.deepLength.equals(deep) && v.isInstanceOf[ClazzSketch]) {  
+       return range
+      }
+
+    }
+   range
+  }
+  
+  
 }
 
 //end of class DiagramSketch
