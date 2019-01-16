@@ -161,6 +161,42 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
     ret
   }
 
+    def parseSketch(skh: ListBuffer[ListBuffer[SketchNode]])  = {
+    val res = new ListBuffer[DiagramLite] //final result
+    val itor = skh.toIterator
+
+    while (itor.hasNext) {
+      val in = itor.next()
+
+      if(in.head.isInstanceOf[ClazzSketch]) {
+        val head =  in.head.asInstanceOf[ClazzSketch]
+        val elem = DiagramLite(head)
+        for( el <- in  ) {
+          val currentDeep = in.head.deepLength + 1
+          val nextDeep = currentDeep + 1
+
+          if (el.deepLength == currentDeep) {
+            el  match {
+              case inhert @ InheritSketch(_) => elem.ext = Some(inhert)
+              case _ =>
+            }
+          }
+          if(el.deepLength == nextDeep) { //for class body sketch
+            el match {
+              case clz @ ClazzSketch(_, _) => elem.inner = clz :: elem.inner //inner class
+              case fun @ FunctionSketch(_, _, _) => elem.method = fun :: elem.method //function get
+              case attr @ AttributeSketch(_, _ ) => elem.attr = attr :: elem.attr
+              case _ =>
+            }
+          }
+        }
+        res.append(elem)
+      }
+    }
+    res
+  }
+
+  
    //get element in temp node
   def getElement(range: ListBuffer[(Int, Int)]) = {
     range.map {
