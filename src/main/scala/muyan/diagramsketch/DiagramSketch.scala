@@ -78,8 +78,15 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
 
       case  TemplateInheritanceSection(extend,_,parent) => {
         updateData{
-          val inherit = if(parent) parent.get.tokens else Nil
-          InheritSketch(inherit)
+          val inherit = if(!parent) Nil else {
+            val value = parent.get
+            //erase extends class generics type param
+            var res = value.copy(typeAndArgs = (Type(value.typeAndArgs._1.contents.take(1)),value.typeAndArgs._2))
+            val filter = res.withTypesAndArgs.map {
+              case (token,tpe, args) => (token, Type(tpe.contents.take(1)), args)
+            }
+            res.copy(withTypesAndArgs = filter).tokens
+          }
         }
       }
       case TemplateBody(_, lb, statSeq, rb) => {
