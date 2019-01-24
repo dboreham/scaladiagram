@@ -100,20 +100,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
       }
       case FunDefOrDcl(defToken, nameToken: Token, _, paramClauses, returnTypeOpt: Option[(Token, Type)], _, _) => {
         updateData{
-         val filterVar: List[(ParamClause, Option[Token])] = paramClauses.paramClausesAndNewlines.map{
-                case (pc, opt) =>
-                  if(pc.firstParamOption.isDefined) {
-                    val p: Param = pc.firstParamOption.get
-                    val firstVar =  p.copy(defaultValueOpt = None)
-                    val otherVar = pc.otherParams.map{
-                      case (token, param) =>
-                        (token,param.copy(defaultValueOpt = None))
-                    }
-                    (pc.copy(firstParamOption = Some(firstVar), otherParams = otherVar), opt)
-                  } else (pc, opt)
-              }
-          
-          val paraList = ParamClauses(paramClauses.newlineOpt, filterVar)
+          val paraList = eraseParamDefaultValues(paramClauses)
           FunctionSketch(List(defToken, nameToken), paraList, returnTypeOpt)
         }
 
@@ -125,6 +112,10 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
           AttributeSketch(attr, t)
         }
       }
+      case PackageStat(_,pack) => {
+      val name = pack.tokens.map(_.rawText).mkString
+        tempNode.append(PackageSketch(name))
+      }
       case _ => //println("### Not MATCH TYPE")
     }
   }
@@ -135,7 +126,24 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
     tempNode.append(updateTreeLength(f, clzDeepLength))
     clzDeepLength -= 1
   }
-  
+ 
+   def eraseParamDefaultValues(paramClauses: ParamClauses) = {
+    val filterVar: List[(ParamClause, Option[Token])] = paramClauses.paramClausesAndNewlines.map{
+      case (pc, opt) =>
+        if(pc.firstParamOption.isDefined) {
+          val p: Param = pc.firstParamOption.get
+          val firstVar =  p.copy(defaultValueOpt = None)
+          val otherVar = pc.otherParams.map{
+            case (token, param) =>
+              (token,param.copy(defaultValueOpt = None))
+          }
+          (pc.copy(firstParamOption = Some(firstVar), otherParams = otherVar), opt)
+        } else (pc, opt)
+    }
+
+    ParamClauses(paramClauses.newlineOpt, filterVar)
+  }
+ 
   def updateTreeLength[B <: SketchNode](sn : B, len: Int): B = {
     sn.deepLength = len
     sn
@@ -145,8 +153,8 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
   def catalystSketch(path: String) = {
 
    val in = sourceParser(readFile(path, None))
-//    in.topStats.otherStats.map(_._2).foreach(extractToken(_))
-    in.topStats.otherStats.foreach(x => extractToken(x._2))
+   val stat = in.topStats.firstStatOpt :: in.topStats.otherStats.map(_._2)
+   stat.foreach(x => extractToken(x._2))
 
      parseSketch(reconstructParseTree())
   }
@@ -154,13 +162,18 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
  def reconstructParseTree() = {
 
     val len = tempNode.length
+    var pack: PackageSketch = PackageSketch()
+   
     val ret = new ListBuffer[ListBuffer[SketchNode]]()
     for( index <- 0 until len) {
       val elem = tempNode(index)
-
-      if (elem.isInstanceOf[ClazzSketch] ) {
+      
+     if(elem.isInstanceOf[PackageSketch]) {
+        pack = pack.copy(name = elem.asInstanceOf[PackageSketch].name)
+      } else if (elem.isInstanceOf[ClazzSketch] ) {
        val r = getSameDeepNode(index, elem.deepLength)
-        val p = getElement(r)
+        val p: ListBuffer[SketchNode] = getElement(r)
+        p.append(pack) //add package name to the end of buffer
         ret.append(p.+=:(elem.asInstanceOf[ClazzSketch]))
       }
 
@@ -187,14 +200,15 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
               case inhert @ InheritSketch(_) => elem.ext = Some(inhert)
               case _ =>
             }
-          }
-          if(el.deepLength == nextDeep) { //for class body sketch
+          } else if(el.deepLength == nextDeep) { //for class body sketch
             el match {
-              case clz @ ClazzSketch(_, _) => elem.inner = clz :: elem.inner //inner class
+              case clz @ ClazzSketch(_, _, _) => elem.inner = clz :: elem.inner //inner class
               case fun @ FunctionSketch(_, _, _) => elem.method = fun :: elem.method //function get
               case attr @ AttributeSketch(_, _ ) => elem.attr = attr :: elem.attr
               case _ =>
             }
+          } else if (el.deepLength.equals(0)) {
+            elem.pack = el.asInstanceOf[PackageSketch]
           }
         }
         res.append(elem)
