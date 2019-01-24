@@ -88,6 +88,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
             }
             res.copy(withTypesAndArgs = filter).tokens
           }
+          InheritSketch(inherit)
         }
       }
       case TemplateBody(_, lb, statSeq, rb) => {
@@ -155,7 +156,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
 
    val in = sourceParser(readFile(path, None))
    val stat = in.topStats.firstStatOpt :: in.topStats.otherStats.map(_._2)
-   stat.foreach(x => extractToken(x._2))
+   stat.foreach(extractToken(_))
 
      parseSketch(reconstructParseTree())
   }
