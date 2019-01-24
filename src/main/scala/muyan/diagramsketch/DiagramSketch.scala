@@ -68,7 +68,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
       case FullDefOrDcl(_, _, defOrDcl) => { //defOrDcl base class, not try to assign type
         extractToken(Some(defOrDcl))
       }
-      case TmplDef(markerTokens, name, _, _, _, _, inherit : Option[TemplateInheritanceSection], body: Option[TemplateBody]) => {
+      case TmplDef(markerTokens, name, _, _, _, param, inherit : Option[TemplateInheritanceSection], body: Option[TemplateBody]) => {
         clzDeepLength += 1
        val pr = if (param) Some(eraseParamDefaultValues(param.get)) else None
        tempNode.append(updateTreeLength(ClazzSketch(markerTokens, name, pr), clzDeepLength))
