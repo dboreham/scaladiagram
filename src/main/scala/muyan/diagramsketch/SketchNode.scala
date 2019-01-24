@@ -8,7 +8,7 @@ sealed trait SketchNode {
   def descSketch: List[String]
 }
 
-case class ClazzSketch(marker: List[Token], name: Token) extends SketchNode {
+case class ClazzSketch(marker: List[Token], name: Token, paramClause: Option[ParamClauses] = None) extends SketchNode {
   override def descSketch: List[String] = {
     List(name.rawText)
   }
@@ -50,10 +50,15 @@ case class AttributeSketch(name: List[Token], typeOpt: Option[List[Token]] = Non
     res
   }
 }
+
+case class PackageSketch(name: String = "") extends SketchNode {
+  def descSketch: List[String] = List(name)
+}
   case class DiagramLite(clz: ClazzSketch,
                          var ext: Option[InheritSketch] = None,
                          var inner: List[ClazzSketch] = Nil,
                          var method: List[FunctionSketch] = Nil,
-                         var attr: List[AttributeSketch] = Nil) //extends SketchNode
+                         var attr: List[AttributeSketch] = Nil,
+                         var pack: PackageSketch = PackageSketch()) //extends SketchNode
 
 
