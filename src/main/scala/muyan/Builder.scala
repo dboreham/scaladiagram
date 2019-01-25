@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 class Builder(path: String, dst: Option[String], format: String) extends Graphviz(dst, format) with DiagramSketch {
   require(new File(path).isFile)
 
-  implicit def toSting(t: List[String]) :String = t.mkString("\n")
+  implicit def toSting(t: List[String]) :String = t.mkString//("\n")
 
   def fileSketch = catalystSketch(path)
 
