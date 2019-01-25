@@ -10,7 +10,10 @@ sealed trait SketchNode {
 
 case class ClazzSketch(marker: List[Token], name: Token, paramClause: Option[ParamClauses] = None) extends SketchNode {
   override def descSketch: List[String] = {
-    List(name.rawText)
+    val pc: List[String] = if (paramClause.isDefined) {
+      paramClause.get.paramClausesAndNewlines.map(_._1.tokens.map(_.rawText).mkString)
+    } else Nil
+    pc.+: (name.rawText)
   }
 }
 
