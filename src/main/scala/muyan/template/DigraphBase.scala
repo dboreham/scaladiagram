@@ -18,12 +18,12 @@ import scala.collection.mutable.ListBuffer
     
    def toStringWithEscape(t: List[String]): String = t.map(x => x + "\\l").mkString
     
-    val ret =  s"""$name [label = "{ <$portName> $name | <var> ${toStringWithEscape(varList)} | <fun> ${toStringWithEscape(fun)} }"];"""
+    val ret =  s""""$name" [label = "{ <$portName> $name | <var> ${toStringWithEscape(varList)} | <fun> ${toStringWithEscape(fun)} }"];"""
     itemBuff.prepend(ret.replace("=>", "=\\>"))
   }
 
   def addRelation(parent: String, child: String, relation: String) ={
-    val t = s"$parent:$portName -> $child:$methodName $relation"
+    val t = s""""$parent":$portName -> "$child":$methodName $relation"""
     relationBuff.prepend(t)
 
   }
