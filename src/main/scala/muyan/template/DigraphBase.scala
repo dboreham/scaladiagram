@@ -14,16 +14,16 @@ import scala.collection.mutable.ListBuffer
   // Composition, Dependency ...
 //  val edge: String //mixed in digraph base
 
-  def addItem(name: String, fun: List[String], varList: List[String]) = {
+  def addItem(name: String, fun: List[String], varList:  List[String],nodeContext: String) = {
     
    def toStringWithEscape(t: List[String]): String = t.map(x => x + "\\l").mkString
     
-    val ret =  s""""$name" [label = "{ <$portName> $name | <var> ${toStringWithEscape(varList)} | <fun> ${toStringWithEscape(fun)} }"];"""
+    val ret =  s""""$name" [label = "{ <$portName> $nodeContext | <var> ${toStringWithEscape(varList)} | <fun> ${toStringWithEscape(fun)} }"];"""
     itemBuff.prepend(ret.replace("=>", "=\\>"))
   }
 
   def addRelation(parent: String, child: String, relation: String) ={
-    val t = s""""$parent":$portName -> "$child":$methodName $relation"""
+    val t = s""""$parent":$portName -> "$child":$methodName $relation;"""
     relationBuff.prepend(t)
 
   }
@@ -39,6 +39,11 @@ import scala.collection.mutable.ListBuffer
        |${itemBuff.mkString}
        |${relationBuff.mkString}
        |$postfix """ .stripMargin
+  }
+   
+  def clear: Unit = {
+   itemBuff.clear()
+   relationBuff.clear()
   }
 
 }//end of digraphBase
