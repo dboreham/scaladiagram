@@ -3,7 +3,10 @@ package muyan.graphviz
 import java.io.{File, FileOutputStream}
 import java.util.ResourceBundle
 
+import muyan.diagramsketch._
 import muyan.template.DigraphBase
+import muyan.template.EdgeGraph.{composition, inherit}
+import scala.language.implicitConversions
 
 import scala.util.Try
 
@@ -24,9 +27,9 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
   /**
   * write dot string @param src src to @see tmpDir and return file handle
   * @param src dot stream
-  * @param fileName specified the file name
+  * @param file specified the file name
   * */
-  def writeDotToFile(src: String, fileName: String) = {
+  def writeDotToFile(src: String, file: File) = {
     val file = new File(s"$tmpDir/$fileName.dot.tmp")
     val fop = new FileOutputStream(file)
     try{
@@ -73,14 +76,58 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
 
   def draw(fileName: String) = {
     val ctx = graphContent
-    writeDotToFile(ctx ,fileName)
     val src = s"$tmpDir/$fileName.dot.tmp"
+    writeDotToFile(ctx ,new File(src))
     buildGraph(src ,s"$dstPath/$fileName")
+//    deleteTmpFile(new File(src))
 
   }
 
   def deleteTmpFile(file: File): Unit = {
     if(file.isFile) file.delete()
+  }
+ 
+  def buildUml(name: String) = {
+    draw(name)
+    clear
+  }
+
+  implicit def sketchToSting(t: List[String]) :String = t.mkString
+
+  //dot builder for parse
+  def dotBuilder(buff: List[DiagramLite]) =  {
+    buff.foreach{
+      case DiagramLite(clz, ext, inner, method, attr, pack, _) =>
+        val filterClz = buff.filter{ el => el.clz.alias.equals(clz.alias)}
+        val isExist = filterClz.forall{x => isExistElement(x.inner, x.method, x.attr, x.pack)}
+
+        if (isExist || (filterClz.length > 1 && isExistElement(inner, method, attr, pack))) {
+          addItem(clz.alias, method.flatMap( e => e.descSketch), attr.flatMap( e => e.descSketch), clz.descSketch)
+        }
+
+        val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
+        //todo fix class has same name
+        //        (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
+        //          name => addItem(name, Nil,Nil)
+        //        }
+
+        extCtx.foreach {
+          o => addRelation(clz.alias, o, inherit)
+        }
+
+        inner.foreach {el =>
+          addRelation(clz.alias, el.descSketch, composition)}
+    }
+
+  }
+
+  private def isExistElement(inner: List[ClazzSketch],
+                             method: List[FunctionSketch],
+                             attr: List[AttributeSketch],
+                             pack: PackageSketch) : Boolean = {
+    // in include element
+    if (attr.nonEmpty || inner.nonEmpty || method.nonEmpty || pack.name.nonEmpty) true
+    else false
   }
 
 } 
