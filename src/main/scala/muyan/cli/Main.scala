@@ -8,7 +8,7 @@ case class CliConfig(
                     src: String,
                     dst: Option[String] = None,
                     format: String = "png",
-                    arrange: String = "package"
+                    arrange: String = "file"
                     )
 
 object Main extends DiagramSketch{

@@ -1,5 +1,6 @@
 package muyan.diagramsketch
 
+import java.io.File
 import java.nio.charset.MalformedInputException
 
 import scala.language.implicitConversions
@@ -13,7 +14,7 @@ import scala.io.{Codec, Source}
 
 trait DiagramSketch {
 
-  //temp node info in a file or package
+  //temp node info in a file or package, must be clear when parsing file finished.
   val tempNode = new ListBuffer[SketchNode]()
 
 def readFile(file: String, encoding: Option[String])(implicit codec: Codec): String = {
@@ -157,8 +158,10 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
    val in = sourceParser(readFile(path, None))
    val stat = in.topStats.firstStatOpt :: in.topStats.otherStats.map(_._2)
    stat.foreach(extractToken(_))
-
-     parseSketch(reconstructParseTree())
+   val name = new File(path).getName
+  parseSketch(reconstructParseTree()).map{
+    x => x.copy(fileName = name)
+  }
   }
   
  def reconstructParseTree() = {
@@ -180,6 +183,7 @@ def readFile(file: String, encoding: Option[String])(implicit codec: Codec): Str
       }
 
     }
+   tempNode.clear()
     ret
   }
 

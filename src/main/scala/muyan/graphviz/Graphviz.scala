@@ -30,7 +30,6 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
   * @param file specified the file name
   * */
   def writeDotToFile(src: String, file: File) = {
-    val file = new File(s"$tmpDir/$fileName.dot.tmp")
     val fop = new FileOutputStream(file)
     try{
       if (!file.exists) {
