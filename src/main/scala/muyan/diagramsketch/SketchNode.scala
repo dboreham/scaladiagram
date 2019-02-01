@@ -15,6 +15,8 @@ case class ClazzSketch(marker: List[Token], name: Token, paramClause: Option[Par
     } else Nil
     pc.+: (name.rawText)
   }
+  
+  def alias : String = name.rawText
 }
 
 // return TemplateParents not List[Token]
@@ -62,6 +64,7 @@ case class PackageSketch(name: String = "") extends SketchNode {
                          var inner: List[ClazzSketch] = Nil,
                          var method: List[FunctionSketch] = Nil,
                          var attr: List[AttributeSketch] = Nil,
-                         var pack: PackageSketch = PackageSketch()) //extends SketchNode
+                         var pack: PackageSketch = PackageSketch(),
+                         var fileName: String = "") //extends SketchNode
 
 
