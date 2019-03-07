@@ -105,17 +105,8 @@ class Graphviz(dst: Option[String], format: String) extends DigraphBase{
         }
 
         val extCtx: List[String] = if(ext.isDefined) ext.get.descSketch else Nil
-        //todo fix class has same name
-        //        (extCtx.filterNot(clz.descSketch.contains(_))).foreach {
-        //          name => addItem(name, Nil,Nil)
-        //        }
-
-        extCtx.foreach {
-          o => addRelation(clz.alias, o, inherit)
-        }
-
-        inner.foreach {el =>
-          addRelation(clz.alias, el.descSketch, composition)}
+         extCtx.foreach { o => addRelation(clz.alias, o, inherit)}
+        inner.foreach {el => addRelation(clz.alias, el.alias, composition)} 
     }
 
   }
