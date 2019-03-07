@@ -50,9 +50,7 @@ case class FunctionSketch(method: List[Token], param: ParamClauses, returnType: 
 case class AttributeSketch(name: List[Token], typeOpt: Option[List[Token]] = None) extends SketchNode {
   override def descSketch: List[String] = {
     val t = if(typeOpt.isDefined) ":" + typeOpt.get.map( _.text).mkString else ""
-    val res = name.map(_.text + t)
-
-    res
+    name.filter(_.tokenType.eq(Tokens.VARID)).map(_.text + t)
   }
 }
 
